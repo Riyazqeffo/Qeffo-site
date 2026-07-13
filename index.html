@@ -651,7 +651,7 @@ async function publishJob() {
   const location = document.getElementById('f-location').value.trim();
   const category = document.getElementById('f-category').value;
   const type     = document.getElementById('f-type')?.value || 'Full-time';
-  const salary   = document.getElementById('f-salary').value.trim();
+  const salary   = document.getElementById('f-salary')?.value.trim() || '';
 
   if(!url || !title || !company || !category) {
     showToast('Please fill in all required fields');
