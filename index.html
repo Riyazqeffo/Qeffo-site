@@ -313,8 +313,9 @@ let currentCategory = 'all';
 // ── Storage ─────────────────────────────────────────────
 async function loadJobs() {
   try {
-    const r = await window.storage.get('qeffo_jobs');
-    jobs = r ? JSON.parse(r.value) : [];
+    const res = await fetch('/.netlify/functions/jobs');
+    const data = await res.json();
+    jobs = Array.isArray(data) ? data : [];
   } catch(e) {
     jobs = [];
   }
@@ -324,7 +325,11 @@ async function loadJobs() {
 
 async function saveJobs() {
   try {
-    await window.storage.set('qeffo_jobs', JSON.stringify(jobs));
+    await fetch('/.netlify/functions/jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(jobs)
+    });
   } catch(e) {
     console.error('Save failed', e);
   }
