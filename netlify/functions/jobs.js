@@ -13,8 +13,20 @@ import { getStore } from '@netlify/blobs';
 const STORE_NAME = 'qeffo-jobs';
 const KEY = 'jobs-list';
 
+function getJobsStore() {
+  const siteID = process.env.NETLIFY_SITE_ID;
+  const token = process.env.NETLIFY_BLOBS_TOKEN;
+  // Prefer explicit manual configuration (works reliably in every deploy
+  // context). Falls back to Netlify's automatic context if manual env vars
+  // aren't set, for environments where auto-detection does work.
+  if (siteID && token) {
+    return getStore({ name: STORE_NAME, siteID, token });
+  }
+  return getStore(STORE_NAME);
+}
+
 export async function handler(event) {
-  const store = getStore(STORE_NAME);
+  const store = getJobsStore();
 
   if (event.httpMethod === 'GET') {
     try {
