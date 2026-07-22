@@ -78,11 +78,27 @@ nav{position:sticky;top:0;z-index:100;background:rgba(42,10,46,0.95);backdrop-fi
 .jobs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
 
 /* JOB CARD */
+.featured-section{padding:0 24px 28px;max-width:1200px;margin:0 auto;}
+.featured-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.featured-header h2{font-size:19px;font-weight:900;color:var(--white);}
+.featured-scroll{display:flex;gap:16px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch;}
+.featured-card{flex:0 0 300px;background:linear-gradient(135deg, rgba(232,102,90,0.18), var(--card));border:1px solid var(--coral);border-radius:16px;padding:20px;}
+.featured-card .badge{display:inline-block;background:rgba(255,255,255,0.15);color:var(--white);font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;}
+.featured-card .company{font-size:17px;font-weight:900;color:var(--white);margin-bottom:12px;}
+.featured-card .roles{list-style:none;margin-bottom:16px;}
+.featured-card .roles li{font-size:13px;color:var(--w70);padding:4px 0 4px 16px;position:relative;}
+.featured-card .roles li::before{content:'•';position:absolute;left:0;color:var(--coral);}
+.featured-card .apply-btn{display:inline-block;background:var(--coral);color:var(--white);padding:10px 18px;border-radius:10px;font-size:13px;font-weight:800;text-decoration:none;transition:background 0.2s;}
+.featured-card .apply-btn:hover{background:var(--coral-lt);}
 .job-card{background:var(--card);border:1px solid var(--w10);border-radius:16px;padding:20px;transition:border-color 0.2s,transform 0.2s;cursor:pointer;text-decoration:none;display:block;}
 .job-card:hover{border-color:var(--coral);transform:translateY(-2px);}
 .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
 .company-avatar{width:42px;height:42px;border-radius:10px;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--coral);flex-shrink:0;border:1px solid var(--w10);}
 .card-cat{font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap;}
+.icon-btn{background:var(--w10);border:1px solid var(--w30);color:var(--w70);width:26px;height:26px;border-radius:8px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background 0.15s;}
+.icon-btn:hover{background:var(--coral);color:var(--white);border-color:var(--coral);}
+.today-toggle{padding:8px 16px;border-radius:100px;border:1px solid var(--w30);background:transparent;color:var(--w70);font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all 0.2s;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.today-toggle.active{background:var(--coral);border-color:var(--coral);color:var(--white);}
 .cat-civil{background:rgba(59,130,246,0.15);color:#60A5FA;}
 .cat-mep{background:rgba(16,185,129,0.15);color:#34D399;}
 .cat-it{background:rgba(139,92,246,0.15);color:#A78BFA;}
@@ -177,6 +193,14 @@ footer{border-top:1px solid var(--w10);padding:28px 32px;display:flex;align-item
   </div>
 </div>
 
+<!-- FEATURED -->
+<div class="featured-section" id="featured-wrap" style="display:none;">
+  <div class="featured-header">
+    <h2>⭐ Featured Opportunities</h2>
+  </div>
+  <div class="featured-scroll" id="featured-scroll"></div>
+</div>
+
 <!-- CONTROLS -->
 <div class="controls">
   <div class="search-wrap">
@@ -194,6 +218,7 @@ footer{border-top:1px solid var(--w10);padding:28px 32px;display:flex;align-item
     <button class="cat-btn" onclick="setCategory('hr',this)">HR</button>
     <button class="cat-btn" onclick="setCategory('general',this)">General</button>
   </div>
+  <button class="today-toggle" id="today-toggle-btn" onclick="toggleTodayOnly(this)">🕐 Today Only</button>
 </div>
 
 <!-- JOBS -->
@@ -208,7 +233,7 @@ footer{border-top:1px solid var(--w10);padding:28px 32px;display:flex;align-item
   <div class="empty" id="empty-state" style="display:none;">
     <div class="empty-icon">🔍</div>
     <h3>No jobs found</h3>
-    <p>Try a different search or category</p>
+    <p id="empty-msg">Try a different search or category</p>
   </div>
 </div>
 
@@ -313,6 +338,32 @@ footer{border-top:1px solid var(--w10);padding:28px 32px;display:flex;align-item
       <div style="text-align:center;font-size:11px;color:var(--w70);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin:22px 0 10px;">— manage existing jobs —</div>
 
       <div id="manage-list" style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+
+      <div style="text-align:center;font-size:11px;color:var(--w70);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin:26px 0 10px;">— 📋 daily whatsapp messages —</div>
+
+      <button type="button" class="btn-cancel" style="width:100%;" onclick="generateWhatsAppMessages()">🔄 Generate Today's Messages</button>
+      <div id="whatsapp-messages" style="margin-top:12px;"></div>
+
+      <div style="text-align:center;font-size:11px;color:var(--w70);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin:26px 0 10px;">— ⭐ featured opportunities —</div>
+
+      <div class="form-group">
+        <label>Company Name</label>
+        <input type="text" id="ft-company" placeholder="e.g. ADNOC Group"/>
+      </div>
+      <div class="form-group">
+        <label>Role Titles (one per line)</label>
+        <textarea id="ft-roles" rows="4" placeholder="Senior Engineer&#10;Project Manager&#10;Site Supervisor"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Official Careers Page Link</label>
+        <input type="url" id="ft-link" placeholder="https://company.com/careers"/>
+      </div>
+      <div class="admin-actions">
+        <button class="btn-publish" id="featured-publish-btn" onclick="publishFeatured()">Publish Featured ⭐</button>
+        <button class="btn-cancel" onclick="clearFeaturedForm()">Clear</button>
+      </div>
+
+      <div id="featured-manage-list" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-top:14px;"></div>
     </div>
 
   </div>
@@ -328,6 +379,50 @@ const ADMIN_PASSWORD = 'Qeffo!Riyaz-2847';
 // ── State ───────────────────────────────────────────────
 let jobs = [];
 let currentCategory = 'all';
+let todayOnly = false;
+
+const CATEGORY_META = {
+  civil: { emoji: '🏗️', label: 'Civil & Architecture' },
+  mep: { emoji: '⚙️', label: 'MEP Engineering' },
+  it: { emoji: '💻', label: 'IT' },
+  finance: { emoji: '💰', label: 'Finance/Accounting' },
+  healthcare: { emoji: '🏥', label: 'Healthcare' },
+  sales: { emoji: '💼', label: 'Sales' },
+  hr: { emoji: '🗂️', label: 'HR/Admin' },
+  general: { emoji: '🔧', label: 'Other' }
+};
+const CATEGORY_ORDER = ['civil','mep','it','finance','healthcare','sales','hr','general'];
+
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+  }
+  return fallbackCopy(text);
+}
+
+function fallbackCopy(text) {
+  return new Promise((resolve, reject) => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      ok ? resolve() : reject(new Error('execCommand failed'));
+    } catch (e) {
+      document.body.removeChild(ta);
+      reject(e);
+    }
+  });
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 
 // ── Storage ─────────────────────────────────────────────
 async function loadJobs() {
@@ -378,10 +473,14 @@ function renderJobs() {
   const grid = document.getElementById('jobs-grid');
   const empty = document.getElementById('empty-state');
 
+  const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+  const todayStartMs = todayStart.getTime();
+
   let filtered = jobs.filter(j => {
     const matchCat = currentCategory === 'all' || j.category === currentCategory;
     const matchSearch = !search || j.title.toLowerCase().includes(search) || j.company.toLowerCase().includes(search) || (j.location||'').toLowerCase().includes(search);
-    return matchCat && matchSearch;
+    const matchToday = !todayOnly || j.timestamp >= todayStartMs;
+    return matchCat && matchSearch && matchToday;
   });
 
   // Sort newest first
@@ -392,6 +491,9 @@ function renderJobs() {
   if(filtered.length === 0) {
     grid.innerHTML = '';
     empty.style.display = 'block';
+    document.getElementById('empty-msg').textContent = todayOnly
+      ? 'No jobs posted today yet in this category — check back soon! 🕐'
+      : 'Try a different search or category';
     return;
   }
 
@@ -400,7 +502,11 @@ function renderJobs() {
     <a href="${j.url}" target="_blank" class="job-card">
       <div class="card-top">
         <div class="company-avatar">${initials(j.company)}</div>
-        <span class="card-cat cat-${j.category}">${catLabels[j.category] || j.category}</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="card-cat cat-${j.category}">${catLabels[j.category] || j.category}</span>
+          <button class="icon-btn" onclick="event.preventDefault();event.stopPropagation();copyJobLink('${j.id}')" title="Copy link">🔗</button>
+          <button class="icon-btn" onclick="event.preventDefault();event.stopPropagation();reportDeadLink('${j.id}')" title="Report dead link">🚩</button>
+        </div>
       </div>
       <div class="job-title">${j.title}</div>
       <div class="job-company">${j.company}</div>
@@ -432,6 +538,30 @@ function setCategory(cat, btn) {
   renderJobs();
 }
 
+function toggleTodayOnly(btn) {
+  todayOnly = !todayOnly;
+  btn.classList.toggle('active', todayOnly);
+  renderJobs();
+}
+
+function copyJobLink(id) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  copyText(job.url).then(() => {
+    showToast('🔗 Link copied');
+  }).catch(() => {
+    showToast('Could not copy link');
+  });
+}
+
+async function reportDeadLink(id) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  job.reports = (job.reports || 0) + 1;
+  await saveJobs();
+  showToast('🚩 Reported — thanks, we\'ll review it');
+}
+
 function filterJobs() { renderJobs(); }
 
 // ── Admin ────────────────────────────────────────────────
@@ -456,6 +586,7 @@ function checkPw() {
     document.getElementById('pw-screen').style.display = 'none';
     document.getElementById('job-form').style.display = 'block';
     renderManageList();
+    renderFeaturedManageList();
   } else {
     document.getElementById('pw-error').style.display = 'block';
     document.getElementById('pw-input').value = '';
@@ -465,24 +596,82 @@ function checkPw() {
 
 let editingJobId = null;
 
+const CATEGORY_OPTIONS = [
+  { value: 'civil', label: 'Civil / Architecture' },
+  { value: 'mep', label: 'MEP Engineering' },
+  { value: 'it', label: 'IT / Technology' },
+  { value: 'finance', label: 'Finance / Accounting' },
+  { value: 'healthcare', label: 'Healthcare' },
+  { value: 'sales', label: 'Sales / Marketing' },
+  { value: 'hr', label: 'HR / Admin' },
+  { value: 'general', label: 'General' }
+];
+
 function renderManageList() {
   const list = document.getElementById('manage-list');
   if (!list) return;
-  const sorted = [...jobs].sort((a,b) => b.timestamp - a.timestamp);
+
+  // Clear any leftover "unsaved changes" bar — if we're re-rendering from a
+  // real save action (delete/edit/load), nothing should be pending anymore.
+  const staleBar = document.getElementById('save-all-bar');
+  if (staleBar) staleBar.remove();
+  categoryChangesPending = false;
+
+  const sorted = [...jobs].sort((a,b) => (b.reports||0) - (a.reports||0) || b.timestamp - a.timestamp);
   if (sorted.length === 0) {
     list.innerHTML = '<p style="font-size:12px;color:var(--w70);text-align:center;padding:10px;">No jobs posted yet.</p>';
     return;
   }
+  const optionsHtml = (selected) => CATEGORY_OPTIONS.map(o =>
+    `<option value="${o.value}" ${o.value === selected ? 'selected' : ''}>${o.label}</option>`
+  ).join('');
+
   list.innerHTML = sorted.map(j => `
-    <div style="display:flex;align-items:center;gap:8px;background:var(--w10);border:1px solid var(--w30);border-radius:10px;padding:10px 12px;">
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${j.title}</div>
+    <div style="display:flex;align-items:center;gap:8px;background:var(--w10);border:1px solid ${j.reports > 0 ? 'var(--coral)' : 'var(--w30)'};border-radius:10px;padding:10px 12px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:140px;">
+        <div style="font-size:13px;font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${j.title}${j.reports > 0 ? ` <span style="background:var(--coral);color:var(--white);font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;margin-left:4px;">🚩 ${j.reports}</span>` : ''}</div>
         <div style="font-size:11px;color:var(--w70);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${j.company}${j.location ? ' · ' + j.location : ''}</div>
       </div>
+      <select onchange="updateJobCategory('${j.id}', this.value)" style="background:var(--card);border:1px solid var(--w30);color:var(--white);border-radius:8px;padding:6px 8px;font-size:12px;font-family:var(--font);">
+        ${optionsHtml(j.category)}
+      </select>
       <button type="button" onclick="startEditJob('${j.id}')" style="background:var(--w10);border:1px solid var(--w30);color:var(--white);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);">✏️ Edit</button>
       <button type="button" onclick="deleteJobConfirm('${j.id}')" style="background:rgba(232,102,90,0.15);border:1px solid var(--coral);color:var(--coral-lt);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);">🗑️ Delete</button>
     </div>
   `).join('');
+}
+
+let categoryChangesPending = false;
+
+function updateJobCategory(id, newCategory) {
+  const job = jobs.find(j => j.id === id);
+  if (!job) return;
+  job.category = newCategory;
+  categoryChangesPending = true;
+  showSaveAllBar();
+}
+
+function showSaveAllBar() {
+  let bar = document.getElementById('save-all-bar');
+  if (bar) return;
+  bar = document.createElement('div');
+  bar.id = 'save-all-bar';
+  bar.style.cssText = 'position:sticky;bottom:0;background:var(--coral);border-radius:10px;padding:10px 14px;margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;';
+  bar.innerHTML = `
+    <span style="font-size:12px;font-weight:700;color:var(--white);">You have unsaved category changes</span>
+    <button type="button" onclick="saveAllCategoryChanges()" style="background:var(--white);color:var(--coral);border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);">💾 Save All</button>
+  `;
+  document.getElementById('manage-list').insertAdjacentElement('afterend', bar);
+}
+
+async function saveAllCategoryChanges() {
+  await saveJobs();
+  renderJobs();
+  updateStats();
+  categoryChangesPending = false;
+  const bar = document.getElementById('save-all-bar');
+  if (bar) bar.remove();
+  showToast('✅ All category changes saved!');
 }
 
 function startEditJob(id) {
@@ -776,6 +965,173 @@ document.getElementById('admin-overlay').addEventListener('click', function(e) {
 });
 
 // ── Init ─────────────────────────────────────────────────
+// ── Daily WhatsApp message generator ─────────────────────
+function generateWhatsAppMessages() {
+  const container = document.getElementById('whatsapp-messages');
+  const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+  const todayStartMs = todayStart.getTime();
+  const todaysJobs = jobs.filter(j => j.timestamp >= todayStartMs);
+
+  if (todaysJobs.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--w70);text-align:center;padding:14px;">No jobs posted today yet.</p>';
+    return;
+  }
+
+  const grouped = {};
+  todaysJobs.forEach(j => {
+    const cat = j.category || 'general';
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(j);
+  });
+
+  const numberEmojis = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'];
+  let html = '';
+
+  CATEGORY_ORDER.forEach(catKey => {
+    const catJobs = grouped[catKey];
+    if (!catJobs || catJobs.length === 0) return;
+    const meta = CATEGORY_META[catKey];
+    const lines = catJobs.map((j, i) => {
+      const num = numberEmojis[i] || (i + 1) + '.';
+      return `${num} ${j.title} — ${j.company}`;
+    }).join('\n');
+    const message = `${meta.emoji} Today's ${meta.label} jobs in UAE:\n\n${lines}\n\nFresh listings posted daily 👇\n🌐 https://qeffo.com\n📸 https://www.instagram.com/qeffouae`;
+    const boxId = 'wa-msg-' + catKey;
+
+    html += `
+      <div style="background:var(--w10);border:1px solid var(--w30);border-radius:12px;padding:14px;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:800;margin-bottom:8px;color:var(--coral-lt);">${meta.emoji} ${meta.label} (${catJobs.length})</div>
+        <textarea readonly id="${boxId}" rows="6" style="width:100%;background:var(--card);border:1px solid var(--w30);border-radius:8px;color:var(--white);font-size:12px;font-family:var(--font);padding:10px;resize:vertical;">${escapeHtml(message)}</textarea>
+        <button type="button" onclick="copyWhatsAppMsg('${boxId}')" style="margin-top:8px;background:var(--coral);color:var(--white);border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--font);">📋 Copy Message</button>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html || '<p style="font-size:12px;color:var(--w70);text-align:center;padding:14px;">No jobs posted today yet.</p>';
+}
+
+function copyWhatsAppMsg(boxId) {
+  const el = document.getElementById(boxId);
+  if (!el) return;
+  copyText(el.value).then(() => {
+    showToast('📋 Copied — paste into WhatsApp');
+  }).catch(() => {
+    showToast('Could not copy — select manually');
+  });
+}
+
+// ── Featured Opportunities ────────────────────────────────
+let featuredList = [];
+
+async function loadFeatured() {
+  try {
+    const res = await fetch('/.netlify/functions/featured');
+    const data = await res.json();
+    featuredList = Array.isArray(data) ? data : [];
+  } catch (e) {
+    featuredList = [];
+  }
+  renderFeaturedPublic();
+}
+
+async function saveFeatured() {
+  try {
+    await fetch('/.netlify/functions/featured', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(featuredList)
+    });
+  } catch (e) {
+    console.error('Save featured failed', e);
+  }
+}
+
+function renderFeaturedPublic() {
+  const wrap = document.getElementById('featured-wrap');
+  const scroll = document.getElementById('featured-scroll');
+  if (!wrap || !scroll) return;
+
+  if (featuredList.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+
+  wrap.style.display = 'block';
+  const sorted = [...featuredList].sort((a, b) => b.timestamp - a.timestamp);
+  scroll.innerHTML = sorted.map(f => `
+    <div class="featured-card">
+      <div class="badge">${f.roles.length} open role${f.roles.length !== 1 ? 's' : ''}</div>
+      <div class="company">${f.company}</div>
+      <ul class="roles">
+        ${f.roles.map(r => `<li>${r}</li>`).join('')}
+      </ul>
+      <a href="${f.link}" target="_blank" class="apply-btn">Apply on Company Site →</a>
+    </div>
+  `).join('');
+}
+
+function renderFeaturedManageList() {
+  const el = document.getElementById('featured-manage-list');
+  if (!el) return;
+  if (featuredList.length === 0) {
+    el.innerHTML = '<p style="font-size:12px;color:var(--w70);text-align:center;padding:10px;">No featured opportunities yet.</p>';
+    return;
+  }
+  const sorted = [...featuredList].sort((a, b) => b.timestamp - a.timestamp);
+  el.innerHTML = sorted.map(f => `
+    <div style="display:flex;align-items:center;gap:8px;background:var(--w10);border:1px solid var(--w30);border-radius:10px;padding:10px 12px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;color:var(--white);">${f.company}</div>
+        <div style="font-size:11px;color:var(--w70);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.roles.join(', ')}</div>
+      </div>
+      <button type="button" onclick="deleteFeaturedConfirm('${f.id}')" style="background:rgba(232,102,90,0.15);border:1px solid var(--coral);color:var(--coral-lt);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);">🗑️ Delete</button>
+    </div>
+  `).join('');
+}
+
+async function publishFeatured() {
+  const company = document.getElementById('ft-company').value.trim();
+  const rolesRaw = document.getElementById('ft-roles').value.trim();
+  const link = document.getElementById('ft-link').value.trim();
+
+  const roles = rolesRaw.split('\n').map(r => r.trim()).filter(Boolean);
+
+  if (!company || roles.length === 0 || !link) {
+    showToast('Please fill in company, at least one role, and the link');
+    return;
+  }
+
+  featuredList.unshift({
+    id: Date.now().toString(),
+    company, roles, link,
+    timestamp: Date.now()
+  });
+
+  await saveFeatured();
+  renderFeaturedPublic();
+  renderFeaturedManageList();
+  clearFeaturedForm();
+  showToast('⭐ Featured opportunity published!');
+}
+
+function clearFeaturedForm() {
+  document.getElementById('ft-company').value = '';
+  document.getElementById('ft-roles').value = '';
+  document.getElementById('ft-link').value = '';
+}
+
+async function deleteFeaturedConfirm(id) {
+  const f = featuredList.find(x => x.id === id);
+  if (!f) return;
+  if (!confirm(`Delete featured listing for "${f.company}"? This can't be undone.`)) return;
+  featuredList = featuredList.filter(x => x.id !== id);
+  await saveFeatured();
+  renderFeaturedPublic();
+  renderFeaturedManageList();
+  showToast('Featured opportunity deleted');
+}
+
+loadFeatured();
 loadJobs();
 
 
